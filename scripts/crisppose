@@ -1,0 +1,107 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Pose estimation example script
+"""
+
+__author__ = "Hannes Ovrén"
+__copyright__ = "Copyright 2013, Hannes Ovrén"
+__license__ = "GPL"
+__email__ = "hannes.ovren@liu.se"
+
+import os
+import sys
+import logging
+import argparse
+logging.basicConfig(format='%(levelname)s %(message)s', level=logging.INFO)
+logger = logging.getLogger()
+
+from scipy.io import savemat
+import numpy as np
+
+import crisp
+from crisp.camera import Kinect
+from crisp.pose import pick_manual
+from crisp.cli import load_imu_from_file, load_vars_from_mat, load_images_timestamps_from_csv
+
+description = """Calculate the relative pose between a camera and IMU.
+
+The user will be prompted to select matching sequences in the camera (optical flow magnitude) and IMU data, which will be used
+for relative pose estimation. At least two sequences are required, but the more the better. The sequences must be rotations around at least
+two (2) non-parallel axes.
+
+This script requires the following data: 1) A CSV file with two columns: [filename, timestamp] that
+decides which files should be used. 2) A file containing IMU data.
+3) Camera calibration matrix
+"""
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("image_csv", metavar="CSV_FILE", help="CSV file that maps filenames to timestamps")
+    parser.add_argument("imu_file", metavar="IMU_FILE", help="File containing IMU data")
+    parser.add_argument("camera_params", metavar="CAM_FILE", help="File containing camera calibration matrix")
+    parser.add_argument("output", nargs="?", help="File to store pose in")
+    parser.add_argument("--num", "-n", default=2, type=int, help="Number of rotation sequences to choose in input")
+    parser.add_argument("--is-kinect-nir", action="store_true", help="Set this to true, if the images in the CSV file are Kinect NIR images")
+    verbose_group = parser.add_mutually_exclusive_group()
+    verbose_group.add_argument("--verbose", "-v", action="store_true")
+    verbose_group.add_argument("--quiet", "-q", action="store_true")
+    args = parser.parse_args()
+    
+    if args.quiet:
+        logger.setLevel(logging.WARNING)
+    elif args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    # Load IMU data
+    imu_file = os.path.expanduser(args.imu_file)
+    imu = load_imu_from_file(imu_file)
+    if imu is None:
+        logger.error("Failed to load IMU data from %s" % imu_file)
+        sys.exit(-1)
+    logger.info("Performing Zero-Level IMU calibration on first 1.0 seconds")
+    imu.zero_level_calibrate(1.0)
+
+    # Create camera instance
+    camera = Kinect.NirCamera() if args.is_kinect_nir else crisp.Camera() 
+
+    # Load timestamps and input image file names
+    image_csv = os.path.expanduser(args.image_csv)
+    files, timestamps = load_images_timestamps_from_csv(image_csv)
+    if len(files) < 1:
+        logger.error("Could not load files and timestamps from %s" % image_csv)
+        sys.exit(-1)
+    camera.files = files
+    camera.timestamps = np.array(timestamps) # Apply multiplier
+            
+    # Load camera matrix
+    try:
+        camera_params_file = os.path.expanduser(args.camera_params)
+        names = ['K', 'Knir', 'Kir'] if args.is_kinect_nir else ['K', 'Krgb']
+        res_dict = load_vars_from_mat(camera_params_file, {'K' : names})
+        camera.K = res_dict['K']
+        logger.debug("Camera calibration matrix is %s" % camera.K)
+    except ValueError as e:
+        logger.error(e.message)
+        sys.exit(-1)
+
+    # Select a number of sequences to use
+    logger.info("Prompt user for %d sequences" % args.num)
+    
+    sync_sequences = pick_manual(camera.image_sequence(), imu.gyro_data, args.num)
+    image_sequences = []
+    gyro_sequences = []
+    for (fa, fb), (ga, gb) in sync_sequences:
+        image_sequences.append(camera.image_sequence(fa, fb))
+        gyro_sequences.append(imu.gyro_data[:, ga:gb+1])
+    
+    # Estimate the pose from the matching sequences
+    Rcg_est, t_est = crisp.estimate_pose(image_sequences, gyro_sequences, camera.K)
+
+    logger.info("Estimated pose is\nRcg=\n%s" % Rcg_est)
+    if args.quiet:
+        print "Rcg=\n%s" % Rcg_est
+    
+    if args.output:
+        logger.info("Storing pose in %s" % args.output)
+        savemat(args.output, {'R' : Rcg_est})
