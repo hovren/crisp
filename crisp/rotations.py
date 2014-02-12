@@ -10,6 +10,7 @@ __email__ = "hannes.ovren@liu.se"
 
 import numpy as np
 
+from numpy.testing import assert_almost_equal
 
 #------------------------------------------------------------------------------
 
@@ -70,26 +71,37 @@ def procrustes(X, Y, remove_mean=False):
 #--------------------------------------------------------------------------
 
 def rotation_matrix_to_axis_angle(R):
-    """Convert rotation matrix to its axis angle representation
+    """Convert a 3D rotation matrix to a 3D axis angle representation
     
     Parameters
     ---------------
-    R : (3,3) ndarray
-            Rotation matrix
-    
+    R : (3,3) array
+        Rotation matrix
+        
     Returns
-    ---------------
-    v : (3,) ndarray
-            Rotation axis (normalized)
+    ----------------
+    v : (3,) array
+        (Unit-) rotation angle
     theta : float
-            Rotation angle (radians)
+        Angle of rotations, in radians
+    
+    Note
+    --------------
+    This uses the algorithm as described in Multiple View Geometry, p. 584
     """
     assert R.shape == (3,3)
-    twocostheta = np.trace(R) - 1;
-    v_tmp = np.array([R[2,1] - R[1,2], R[0,2] - R[2,0], R[1,0] - R[0,1]]).T;
-    twosintheta = np.sqrt(np.sum(v_tmp**2)); # This forces a positive angle theta since 2sin(theta) >= 0
-    theta = np.math.atan2(twosintheta, twocostheta)
-    v = v_tmp / twosintheta
+    assert_almost_equal(np.linalg.det(R), 1.0, err_msg="Not a rotation matrix: determinant was not 1")
+    S, V = np.linalg.eig(R)
+    k = np.argmin(np.abs(S - 1.))
+    s = S[k]
+    assert_almost_equal(s, 1.0, err_msg="Not a rotation matrix: No eigen value s=1")
+    v = np.real(V[:, k]) # Result is generally complex
+    
+    vhat = np.array([R[2,1] - R[1,2], R[0,2] - R[2,0], R[1,0] - R[0,1]])
+    sintheta = 0.5 * np.dot(v, vhat)
+    costheta = 0.5 * (np.trace(R) - 1)
+    theta = np.arctan2(sintheta, costheta)
+    
     return (v, theta)
 
 #--------------------------------------------------------------------------
