@@ -32,3 +32,4 @@ from .imu import IMU
 from .camera import Camera
 from .timesync import sync_camera_gyro, sync_camera_gyro_manual, refine_time_offset, good_sequences_to_track
 from .pose import estimate_pose
+from .fastintegrate import integrate_gyro_quaternion_uniform

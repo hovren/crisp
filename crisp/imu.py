@@ -18,6 +18,7 @@ import re
 import scipy.io
 
 from . import rotations
+from . import fastintegrate
  
 #--------------------------------------------------------------------------
 # Classes
@@ -113,39 +114,45 @@ class IMU(object):
         """
         return pose_correction.dot(self.gyro_data)
             
-    def integrate(self, pose_correction=np.eye(3)):
+    def integrate(self, pose_correction=np.eye(3), uniform=True):
         """Integrate angular velocity measurements to rotations.
 
         Parameters
         -------------
         pose_correction : (3,3) ndarray, optional
                 Rotation matrix that describes the relative pose between the IMU and something else (e.g. camera).
-        
+        uniform : bool
+                If True (default), assume uniform sample rate. This will use a faster integration method.
         Returns
         -------------
         rotations : (4, N) ndarray
                 Rotations as unit quaternions with scalar as first element.
         """
-        N = len(self.timestamps)
-        integrated = np.zeros((4, N))
-        integrated[:,0] = np.array([1, 0, 0, 0]) # Initial rotation (no rotation)
         
-        # Iterate over all
-        for i in xrange(1, len(self.timestamps)):
-            w = pose_correction.dot(self.gyro_data[:, i]) # Change to correct coordinate frame
-            dt = float(self.timestamps[i] - self.timestamps[i - 1])
-            qprev = integrated[:, i - 1].flatten()
+        if uniform:
+            dt = self.timestamps[1]-self.timestamps[0]
+            return fastintegrate.integrate_gyro_quaternion_uniform(self.gyro_data_corrected, dt)
+        else:            
+            N = len(self.timestamps)
+            integrated = np.zeros((4, N))
+            integrated[:,0] = np.array([1, 0, 0, 0]) # Initial rotation (no rotation)
             
-            A = np.array([[0,    -w[0],  -w[1],  -w[2]],
-                         [w[0],  0,      w[2],  -w[1]],
-                         [w[1], -w[2],   0,      w[0]],
-                         [w[2],  w[1],  -w[0],   0]])
-            qnew = (np.eye(4) + (dt/2.0) * A).dot(qprev)
-            qnorm = np.sqrt(np.sum(qnew ** 2))
-            qnew = qnew / qnorm if qnorm > 0 else 0
-            integrated[:, i] = qnew
-            #print "%d, %s, %s, %s, %s" % (i, w, dt, qprev, qnew)
-        return integrated
+            # Iterate over all
+            for i in xrange(1, len(self.timestamps)):
+                w = pose_correction.dot(self.gyro_data[:, i]) # Change to correct coordinate frame
+                dt = float(self.timestamps[i] - self.timestamps[i - 1])
+                qprev = integrated[:, i - 1].flatten()
+                
+                A = np.array([[0,    -w[0],  -w[1],  -w[2]],
+                             [w[0],  0,      w[2],  -w[1]],
+                             [w[1], -w[2],   0,      w[0]],
+                             [w[2],  w[1],  -w[0],   0]])
+                qnew = (np.eye(4) + (dt/2.0) * A).dot(qprev)
+                qnorm = np.sqrt(np.sum(qnew ** 2))
+                qnew = qnew / qnorm if qnorm > 0 else 0
+                integrated[:, i] = qnew
+                #print "%d, %s, %s, %s, %s" % (i, w, dt, qprev, qnew)
+            return integrated
         
     @staticmethod
     def rotation_at_time(t, timestamps, rotation_sequence):
