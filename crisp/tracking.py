@@ -27,7 +27,7 @@ GFTT_DEFAULTS = {'max_corners' : 40,
 # Public functions
 #--------------------------------------------------------------------------
 
-def track_points(img1, img2, initial_points=[], gftt_params={}):
+def track_points(img1, img2, initial_points=None, gftt_params={}):
     """Track points between two images
     
     Parameters
@@ -53,7 +53,7 @@ def track_points(img1, img2, initial_points=[], gftt_params={}):
     if gftt_params:
         params.update(gftt_params)
 
-    if not initial_points:
+    if initial_points is None:
         initial_points = cv2.goodFeaturesToTrack(img1, params['max_corners'], params['quality_level'], params['min_distance'])
     
     [_points, status, err] = cv2.calcOpticalFlowPyrLK(img1, img2, initial_points, np.array([]))
