@@ -148,6 +148,7 @@ def quat_to_rotation_matrix(q):
     """
     q = q.flatten()
     assert q.size == 4
+    assert_almost_equal(np.linalg.norm(q), 1.0, err_msg="Not a unit quaternion!")
     qq = q ** 2
     R = np.array([[qq[0] + qq[1] - qq[2] - qq[3], 2*q[1]*q[2] -
 2*q[0]*q[3], 2*q[1]*q[3] + 2*q[0]*q[2]],
@@ -232,6 +233,6 @@ def slerp(q1, q2, u):
         q = f1*q1 + f2*q2
         q = q / np.sqrt(np.sum(q**2)) # Normalize
     else:
-        q = f1*q1 + f2*q2 # No need for normalization        
-    
+        q = f1*q1 + f2*q2 
+        q = q / np.sqrt(np.sum(q**2)) # Normalize
     return q
