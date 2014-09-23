@@ -31,7 +31,7 @@ from . import znccpyr
 # Public functions
 #--------------------------------------------------------------------------
 
-def sync_camera_gyro(image_sequence, image_timestamps, gyro_data, gyro_timestamps, levels=6, full_output=False):
+def sync_camera_gyro(image_sequence_or_flow, image_timestamps, gyro_data, gyro_timestamps, levels=6, full_output=False):
     """Get time offset that aligns image timestamps with gyro timestamps.
     
     Given an image sequence, and gyroscope data, with their respective timestamps,
@@ -55,7 +55,7 @@ def sync_camera_gyro(image_sequence, image_timestamps, gyro_data, gyro_timestamp
     
     Parameters
     ---------------
-    image_sequence : sequence of image data
+    image_sequence_or_flow : sequence of image data, or ndarray
             This must be either a list or generator that provides a stream of 
             images that are used for optical flow calculations.
     image_timestamps : ndarray
@@ -79,9 +79,15 @@ def sync_camera_gyro(image_sequence, image_timestamps, gyro_data, gyro_timestamp
             The calculated optical flow magnitude
     """
     
-    # Get rotation magnitude from gyro data
+    # If input is not flow, then create from iamge sequence
+    try:
+        assert image_sequence_or_flow.ndim == 1
+        flow_org = image_sequence_or_flow
+    except AssertionError:    
+        flow_org = tracking.optical_flow_magnitude(image_sequence_or_flow)
+    
+    # Gyro from gyro data
     gyro_mag = np.sum(gyro_data**2, axis=0)
-    flow_org = tracking.optical_flow_magnitude(image_sequence)
     flow_timestamps = image_timestamps[:-2]
 
     # Resample to match highest
@@ -109,7 +115,7 @@ def sync_camera_gyro(image_sequence, image_timestamps, gyro_data, gyro_timestamp
         return time_offset, flow_org # Return the orginal flow, not the upsampled version
     else:
         return time_offset
-
+        
 #--------------------------------------------------------------------------
 
 def sync_camera_gyro_manual(image_sequence, image_timestamps, gyro_data, gyro_timestamps, full_output=False):
