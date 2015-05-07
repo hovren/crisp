@@ -231,21 +231,23 @@ class ArduIMU(IMU):
         return (timestamps, accelerometer.T, gyroscope.T)
         
 class L3G4200DGyro(IMU):
-    def __init__(self, filename):
+    def __init__(self, filename, post_process=True):
         super(L3G4200DGyro, self).__init__()
         self.filename = filename
-        ts, gyro = self.__load(filename)
+        ts, gyro = self.__load(filename, post_process)
         self.timestamps = ts
         self.gyro_data = gyro
         
-    def __load(self, filename):
+    def __load(self, filename, post_process=True):
         data, ts, T = l3g4200d.load_L3G_arduino(filename)
         
         # Our L3G4200D rig has some issues
-        data_post = l3g4200d.post_process_L3G4200D_data(data)
+	if post_process:
+		print "Post processing L3G4200D data"
+		data = l3g4200d.post_process_L3G4200D_data(data)
         assert data.shape[0] == 3, "Expected gyro to have 3 elements in first dim, got {0:d}".format(data.shape[0])        
         
-        return ts, data_post
+        return ts, data
 
 
 
