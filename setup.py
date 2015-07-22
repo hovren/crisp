@@ -9,7 +9,7 @@ fastint_sources = ["crisp/fastintegrate/fastint.pyx",]
 fastint_module = Extension("crisp.fastintegrate", fastint_sources)
 
 setup(name='crisp',
-      version='1.0',
+      version='2.0',
       author="Hannes Ovrén",
       author_email="hannes.ovren@liu.se",
       description="Camera-to-IMU calibration and synchronization toolkit",
