@@ -216,6 +216,20 @@ class AtanCameraModel(CameraModel):
         return Y
 
     def project(self, points):
+        """Project 3D points to image coordinates.
+
+        This projects 3D points expressed in the camera coordinate system to image points.
+
+        Parameters
+        --------------------
+        points : (3, N) ndarray
+            3D points
+
+        Returns
+        --------------------
+        image_points : (2, N) ndarray
+            The world points projected to the image plane
+        """
         K = self.camera_matrix
         XU = points
         XU /= np.tile(XU[2], (3,1))
@@ -224,6 +238,21 @@ class AtanCameraModel(CameraModel):
         return from_homogeneous(x2d)
 
     def unproject(self, image_points):
+        """Find (up to scale) 3D coordinate of an image point
+
+        This is the inverse of the `project` function.
+        The resulting 3D points are only valid up to an unknown scale.
+
+        Parameters
+        ----------------------
+        image_points : (2, N) ndarray
+            Image points
+
+        Returns
+        ----------------------
+        points : (3, N) ndarray
+            3D coordinates (valid up to scale)
+        """
         Ki = self.inv_camera_matrix
         X = np.dot(Ki, to_homogeneous(image_points))
         X /= X[2]
@@ -260,11 +289,40 @@ class OpenCVCameraModel(CameraModel):
         self.dist_coefs = dist_coefs
 
     def project(self, points):
+        """Project 3D points to image coordinates.
+
+        This projects 3D points expressed in the camera coordinate system to image points.
+
+        Parameters
+        --------------------
+        points : (3, N) ndarray
+            3D points
+
+        Returns
+        --------------------
+        image_points : (2, N) ndarray
+            The world points projected to the image plane
+        """
         rvec = tvec = np.zeros(3)
         image_points, jac = cv2.projectPoints(points.T.reshape(-1,1,3), rvec, tvec, self.camera_matrix, self.dist_coefs)
         return image_points
 
     def unproject(self, image_points):
+        """Find (up to scale) 3D coordinate of an image point
+
+        This is the inverse of the `project` function.
+        The resulting 3D points are only valid up to an unknown scale.
+
+        Parameters
+        ----------------------
+        image_points : (2, N) ndarray
+            Image points
+
+        Returns
+        ----------------------
+        points : (3, N) ndarray
+            3D coordinates (valid up to scale)
+        """
         undist_image_points = cv2.undistortPoints(image_points.T.reshape(-1,1,2), self.camera_matrix, self.dist_coefs, P=self.camera_matrix)
         world_points = np.dot(self.inv_camera_matrix, to_homogeneous(undist_image_points.reshape(-1,2).T))
         return world_points
