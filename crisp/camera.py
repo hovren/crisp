@@ -16,7 +16,7 @@ import numpy as np
 import cv2
 import scipy.interpolate
 
-from . import remove_slp
+import remove_slp
 
 class CameraModel(object):
     """Class that describes a camera model
@@ -229,6 +229,46 @@ class AtanCameraModel(CameraModel):
         X /= X[2]
         XU = self.invert(X)
         return XU
+
+
+class OpenCVCameraModel(CameraModel):
+    """OpenCV camera model
+
+    This implements the camera model as defined in OpenCV.
+    For details, see the OpenCV documentation.
+    """
+    def __init__(self, image_size, frame_rate, readout, camera_matrix, dist_coefs):
+        """Create camera model
+
+        Parameters
+        -------------------
+        image_size : tuple (rows, columns)
+            The size of the image in pixels
+        frame_rate : float
+            The frame rate of the camera
+        readout : float
+            Rolling shutter readout time. Set to 0 for global shutter cameras.
+        camera_matrix : (3, 3) ndarray
+            The internal camera calibration matrix
+        dist_coefs : ndarray
+            Distortion coefficients [k1, k2, p1, p2 [,k3 [,k4, k5, k6]] of 4, 5, or 8 elements.
+            Can be set to None to use zero parameters
+        """
+        super(OpenCVCameraModel, self).__init__(image_size, frame_rate, readout)
+        self.camera_matrix = camera_matrix
+        self.inv_camera_matrix = np.linalg.inv(self.camera_matrix)
+        self.dist_coefs = dist_coefs
+
+    def project(self, points):
+        rvec = tvec = np.zeros(3)
+        image_points, jac = cv2.projectPoints(points.T.reshape(-1,1,3), rvec, tvec, self.camera_matrix, self.dist_coefs)
+        return image_points
+
+    def unproject(self, image_points):
+        undist_image_points = cv2.undistortPoints(image_points.T.reshape(-1,1,2), self.camera_matrix, self.dist_coefs, P=self.camera_matrix)
+        world_points = np.dot(self.inv_camera_matrix, to_homogeneous(undist_image_points.reshape(-1,2).T))
+        return world_points
+
 
 def to_homogeneous(X):
     if X.ndim == 1:

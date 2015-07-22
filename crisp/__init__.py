@@ -14,6 +14,6 @@ __copyright__ = "Copyright 2015, Hannes Ovrén"
 __license__ = "GPL"
 __email__ = "hannes.ovren@liu.se"
 
-from camera import CameraModel, AtanCameraModel
+from camera import CameraModel, AtanCameraModel, OpenCVCameraModel
 from stream import GyroStream, VideoStream, OpenCvVideoStream
 from calibration import AutoCalibrator, CalibrationError, InitializationError
