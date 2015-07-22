@@ -1,0 +1,6 @@
+build/
+*.pyc
+*.mat
+*~
+*.m
+crisp/fastintegrate/fastint.c

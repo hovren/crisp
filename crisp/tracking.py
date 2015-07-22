@@ -90,6 +90,9 @@ def optical_flow_magnitude(image_sequence, max_diff=60, gftt_options={}):
     flow = []
     prev_img = None
     for img in image_sequence:
+        if img.ndim == 3 and img.shape[2] == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
         if prev_img is None:
             prev_img = img
             continue

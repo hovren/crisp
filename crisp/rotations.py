@@ -12,6 +12,8 @@ import numpy as np
 
 from numpy.testing import assert_almost_equal
 
+from . import ransac
+
 #------------------------------------------------------------------------------
 
 def procrustes(X, Y, remove_mean=False):
@@ -21,11 +23,15 @@ def procrustes(X, Y, remove_mean=False):
     where
         X = R*Y + t
     
+    The number of points in X and Y must be at least 2.
+    For the minimal case of two points, a third point is temporarily created
+    and used for the estimation.
+    
     Parameters
     -----------------
-    X : (D, N) ndarray
+    X : (3, N) ndarray
             First set of points
-    Y : (D, N) ndarray
+    Y : (3, N) ndarray
             Second set of points
     remove_mean : bool
             If true, the mean is removed from X and Y before solving the
@@ -37,12 +43,19 @@ def procrustes(X, Y, remove_mean=False):
             Rotation component
     t : (3,) ndarray
             Translation component (None if remove_mean is False)
-    
-            
-
-    Calculate rotation and translation from points X (DxN) to Y (DxN) where N is number of points and D is dimensionality. Return R, t where """
+ """
 
     assert X.shape == Y.shape
+    assert X.shape[0] > 1
+    
+    # Minimal case, create third point using cross product
+    if X.shape[0] == 2:
+        X3 = np.cross(X[:,0], X[:,1], axis=0)
+        X = np.hstack((X, X3 / np.linalg.norm(X3)))
+        Y3 = np.cross(Y[:,0], Y[:,1], axis=0)
+        Y = np.hstack((Y, Y3 / np.linalg.norm(Y3)))
+        
+    
     D, N = X.shape[:2]
     if remove_mean:
         mx = np.mean(X, axis=1).reshape(D, 1)
@@ -121,14 +134,17 @@ def axis_angle_to_rotation_matrix(v, theta):
     R : (3,3) ndarray
             Rotation matrix
     """
-    v = v.reshape(3,1)
-    np.testing.assert_almost_equal(np.linalg.norm(v), 1.)
-    vx = np.array([[0, -v[2], v[1]],
-                   [v[2], 0, -v[0]],
-                   [-v[1], v[0], 0]])
-    vvt = np.dot(v, v.T)
-    R = np.eye(3)*np.cos(theta) + (1 - np.cos(theta))*vvt + vx * np.sin(theta)
-    return R
+    if np.abs(theta) < np.spacing(1):
+        return np.eye(3)
+    else:
+        v = v.reshape(3,1)
+        np.testing.assert_almost_equal(np.linalg.norm(v), 1.)
+        vx = np.array([[0, -v[2], v[1]],
+                       [v[2], 0, -v[0]],
+                       [-v[1], v[0], 0]])
+        vvt = np.dot(v, v.T)
+        R = np.eye(3)*np.cos(theta) + (1 - np.cos(theta))*vvt + vx * np.sin(theta)
+        return R
 
 #--------------------------------------------------------------------------
 
@@ -236,3 +252,62 @@ def slerp(q1, q2, u):
         q = f1*q1 + f2*q2 
         q = q / np.sqrt(np.sum(q**2)) # Normalize
     return q
+
+#--------------------------------------------------------------------------
+
+def estimate_rotation_procrustes_ransac(x, y, camera, threshold, inlier_ratio=0.75, do_translation=False):
+    """Calculate rotation between two sets of image coordinates using ransac.
+    
+    Inlier criteria is the reprojection error of y into image 1.
+
+    Parameters
+    -------------------------
+    x : array 2xN image coordinates in image 1
+    y : array 2xN image coordinates in image 2
+    camera : Camera model
+    threshold : float pixel distance threshold to accept as inlier
+    do_translation : bool Try to estimate the translation as well
+
+    Returns
+    ------------------------
+    R : array 3x3 The rotation that best fulfills X = RY
+    t : array 3x1 translation if do_translation is False
+    residual : array pixel distances ||x - xhat|| where xhat ~ KRY (and lens distorsion)
+    inliers : array Indices of the points (in X and Y) that are RANSAC inliers
+    """
+    assert x.shape == y.shape
+    assert x.shape[0] == 2
+    
+    X = camera.unproject(x)
+    Y = camera.unproject(y)
+    
+    data = np.vstack((X, Y, x))
+    assert data.shape[0] == 8
+    
+    model_func = lambda data: procrustes(data[:3], data[3:6], remove_mean=do_translation)
+    
+    def eval_func(model, data):
+        Y = data[3:6].reshape(3,-1)
+        x = data[6:].reshape(2,-1)
+        R, t = model
+
+        Xhat = np.dot(R, Y) if t is None else np.dot(R, Y) + t
+        xhat = camera.project(Xhat)
+        dist = np.sqrt(np.sum((x-xhat)**2, axis=0))
+
+        return dist
+    
+    inlier_selection_prob = 0.99999
+    model_points = 2
+    ransac_iterations = int(np.log(1 - inlier_selection_prob) / np.log(1-inlier_ratio**model_points))
+    
+    model_est, ransac_consensus_idx = ransac.RANSAC(model_func, eval_func, data, model_points, ransac_iterations, threshold, recalculate=True)    
+    if model_est is not None:
+        (R, t) = model_est
+        dist = eval_func((R, t), data)                
+    else:
+        dist = None
+        R, t = None, None
+        ransac_consensus_idx = []
+
+    return R, t, dist, ransac_consensus_idx
