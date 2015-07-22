@@ -1,14 +1,13 @@
 To cite this software please use the following BibTex information
 
-@inproceedings{Ovren2013,
-author = {Ovren, Hannes and Forssen, Per-Erik and Tornqvist, David},
-booktitle = {2013 IEEE Workshop on Robot Vision (WORV)},
-doi = {10.1109/WORV.2013.6521916},
-isbn = {978-1-4673-5648-0},
-month = jan,
-pages = {68--75},
-publisher = {IEEE},
-title = {{Why would i want a gyroscope on my RGB-D sensor?}},
-url = {http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=6521916},
-year = {2013}
+@inproceedings{Ovren2015,
+title = {{Gyroscope-based video stabilisation with auto-calibration}},
+author = {Ovrén, Hannes and Forssén, Per-Erik},
+booktitle = {2015 IEEE International Conference on Robotics and Automation (ICRA)},
+year = {2015},
+month = may,
+address = {Seattle, WA},
+pages = {2090--2097},
+doi = {10.1109/ICRA.2015.7139474},
 }
+
