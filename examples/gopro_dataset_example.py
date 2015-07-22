@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 """
 This is an example script that shows how to run the calibrator on our dataset.
 The dataset can be found here:
@@ -13,8 +15,6 @@ __author__ = "Hannes Ovrén"
 __copyright__ = "Copyright 2015, Hannes Ovrén"
 __license__ = "GPL"
 __email__ = "hannes.ovren@liu.se"
-
-from __future__ import print_function
 
 import os
 import sys
