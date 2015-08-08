@@ -303,7 +303,7 @@ class AutoCalibrator(object):
 
 def sample_at_time(t, rate):
     s = t * rate
-    n = np.ceil(s)
+    n = int(np.ceil(s))
     tau = s - n
     return n, tau
 
