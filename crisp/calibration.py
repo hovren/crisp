@@ -185,8 +185,8 @@ class AutoCalibrator(object):
         x0 = np.array([self.parameter[param] for param in PARAM_ORDER])
         available_tracks = np.sum([len(s.inliers) for s in self.slices])
         if available_tracks < max_tracks:
-            max_tracks = available_tracks
             warnings.warn("Could not use the requested {} tracks, since only {} were available in the slice data.".format(max_tracks, available_tracks))
+            max_tracks = available_tracks
 
         # Get subset of available tracks such that all slices are still used
         slice_sample_idxs = videoslice.fill_sampling(self.slices, max_tracks)
