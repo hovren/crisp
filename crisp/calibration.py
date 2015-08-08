@@ -243,22 +243,27 @@ class AutoCalibrator(object):
             if _slice.axis is None:
                 continue
             assert _slice.angle > 0
-            video_axes.append(_slice.axis)
             
             t1 = _slice.start / float(self.video.frame_rate)
             n1, _ = self.video_time_to_gyro_sample(t1)
             t2 = _slice.end / float(self.video.frame_rate)
             n2, _ = self.video_time_to_gyro_sample(t2)
             
-            qx = q[n1]
-            qy = q[n2]
+            try:
+                qx = q[n1]
+                qy = q[n2]
+            except IndexError:
+                continue # No gyro data -> nothing to do with this slice
+                
             Rx = rotations.quat_to_rotation_matrix(qx)
             Ry = rotations.quat_to_rotation_matrix(qy)
             R = np.dot(Rx.T, Ry)
             v, theta = rotations.rotation_matrix_to_axis_angle(R)
             if theta < 0:
                 v = -v
-            gyro_axes.append(v)        
+                
+            gyro_axes.append(v)
+            video_axes.append(_slice.axis)    
 
         logger.debug("Using {:d} slices (from initial {:d} for rotation estimation".format(len(gyro_axes), len(self.slices)))
 
