@@ -345,17 +345,44 @@ def optimization_func(x, slices, slice_sample_idxs, camera, gyro):
         integration_start = slice_start
         integration_end = slice_end + integration_margin
 
-        # Depending on the data and current set of parameters, it is quite possible that
-        # we might try to integrate outside of available data.
-        # To not vary the number of residuals between iterations, add zero residuals for these.
-        if integration_start < 0 or integration_end >= gyro.num_samples or (integration_end - integration_start) < 1:
-            logging.debug("Integration range [{:d},{:d}] is outside gyro data range [{:d},{:d}]".format(integration_start, integration_end, 0, gyro.num_samples-1))
-            num_zero_residuals = 2 * 2 * len(sample_idxs) # 2 dim per point, 2 because of symmetric cost
-            errors.extend(np.zeros((num_zero_residuals, )))
-            continue
+        # Handle out of bounds cases by padding left and right using 
+        # first and last gyroscope sample respectively
+        if integration_start < 0 or integration_end >= gyro.num_samples:
+            num_local_samples = integration_end - integration_start + 1
+            gyro_part = np.empty((num_local_samples, 3))
 
-        # Integrate
-        gyro_part = gyro.data[integration_start:integration_end+1]
+            if integration_start < 0:
+                # Pad left
+                part_start = -integration_start
+                data_start = 0
+                gyro_part[:part_start] = gyro.data[0]
+            else:
+                part_start = 0
+                data_start = integration_start
+            
+            if integration_end >= gyro.num_samples:
+                # Pad right
+                rpad_len = integration_end - gyro.num_samples + 1
+                if rpad_len < num_local_samples:
+                    gyro_part[-rpad_len:] = gyro.data[-1]
+                else: # integration range outside data
+                    gyro_part[:] = gyro.data[-1]
+                part_end = -rpad_len # Not inclusive
+                data_end = gyro.num_samples
+            else:
+                part_end = num_local_samples
+                data_end = integration_end + 1
+            
+            try:
+                gyro_part[part_start:part_end] = gyro.data[data_start:data_end]
+            except ValueError:
+                pass # Completely out of bounds. This is OK.
+                
+        else: # No pad required (default case)
+            gyro_part = gyro.data[integration_start:integration_end+1]
+        
+    # TODO: Decide what to do if integration_end - integration_start < 1. This 
+            
         gyro_part_corrected = gyro_part + gyro_bias
         q = fastintegrate.integrate_gyro_quaternion_uniform(gyro_part_corrected, Tg)
 
