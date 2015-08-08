@@ -231,7 +231,7 @@ class AtanCameraModel(CameraModel):
         """
         K = self.camera_matrix
         XU = points
-        XU /= np.tile(XU[2], (3,1))
+        XU = XU / np.tile(XU[2], (3,1))
         X = self.apply(XU)
         x2d = np.dot(K, X)
         return from_homogeneous(x2d)
@@ -254,7 +254,7 @@ class AtanCameraModel(CameraModel):
         """
         Ki = self.inv_camera_matrix
         X = np.dot(Ki, to_homogeneous(image_points))
-        X /= X[2]
+        X = X / X[2]
         XU = self.invert(X)
         return XU
 
