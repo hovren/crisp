@@ -146,7 +146,6 @@ class AtanCameraModel(CameraModel):
         """
         import h5py
         with h5py.File(filename, 'r') as f:
-            print f
             wc = f["wc"].value
             lgamma = f["lgamma"].value
             K = f["K"].value
