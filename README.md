@@ -1,5 +1,5 @@
 # Camera-to-IMU calibration toolbox
-This toolbox provides a python library to perform joint calibration of a camera gyroscope system.
+This toolbox provides a python library to perform joint calibration of a rolling shutter camera-gyroscope system.
 
 Given gyroscope and video data, this library can find the following parameters
 
