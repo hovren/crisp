@@ -414,7 +414,7 @@ def optimization_func(x, slices, slice_sample_idxs, camera, gyro):
             Xhat = np.dot(R, Y)
             xhat = camera.project(Xhat)
 
-            err = x - xhat
+            err = x - xhat.flatten()
             errors.extend(err.flatten())
 
             # Symmetric errors, so let's do this again
@@ -425,7 +425,7 @@ def optimization_func(x, slices, slice_sample_idxs, camera, gyro):
             Yhat = np.dot(R, X)
             yhat = camera.project(Yhat)
 
-            err = y - yhat
+            err = y - yhat.flatten()
             errors.extend(err.flatten())
 
     if not errors:
