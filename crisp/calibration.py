@@ -208,8 +208,16 @@ class AutoCalibrator(object):
         else:
             raise CalibrationError(mesg)
 
-    def find_initial_offset(self):
+    def find_initial_offset(self, pyramids=6):
         """Estimate time offset
+        
+        This sets and returns the initial time offset estimation.
+        
+        Parameters
+        ---------------
+        pyramids : int
+            Number of pyramids to use for ZNCC calculations.
+            If initial estimation of time offset fails, try lowering this value.
 
         Returns
         ---------------
@@ -220,7 +228,7 @@ class AutoCalibrator(object):
         gyro_rate = self.parameter['gyro_rate']
         frame_times = np.arange(len(flow)) / self.video.frame_rate
         gyro_times = np.arange(self.gyro.num_samples) / gyro_rate
-        time_offset = timesync.sync_camera_gyro(flow, frame_times, self.gyro.data.T, gyro_times, levels=6)
+        time_offset = timesync.sync_camera_gyro(flow, frame_times, self.gyro.data.T, gyro_times, levels=pyramids)
         return time_offset
 
     def find_initial_rotation(self):
