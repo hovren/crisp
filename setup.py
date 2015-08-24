@@ -19,7 +19,13 @@ try:
     USE_CYTHON = True
 except ImportError:
     USE_CYTHON = False
-        
+
+try:
+    from pypandoc import convert
+    read_md = lambda f: convert(f, 'rst')
+except ImportError:
+    print "warning: pypandoc module not found, could not convert Markdown to RST"
+    read_md = lambda f: open(f, 'r').read()
 
 # Fast quaternion integration module
 file_ext = 'pyx' if USE_CYTHON else 'c'
@@ -53,15 +59,14 @@ requires = [ 'cv2', # OpenCV
              'matplotlib'
 ]
 
-long_description = open('README.md','r').read()
 
 setup(name='crisp',
-      version='2.1rc12',
+      version='2.1rc13',
       author="Hannes Ovrén",
       author_email="hannes.ovren@liu.se",
       url="https://github.com/hovren/crisp",
       description="Camera-to-IMU calibration and synchronization toolkit",
-      long_description=long_description,
+      long_description=read_md('README.md'),
       license="GPL",
       packages=['crisp'],
       ext_modules=ext_modules,
