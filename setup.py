@@ -61,7 +61,7 @@ requires = [ 'cv2', # OpenCV
 
 
 setup(name='crisp',
-      version='2.1rc13',
+      version='2.1',
       author="Hannes Ovrén",
       author_email="hannes.ovren@liu.se",
       url="https://github.com/hovren/crisp",
