@@ -84,7 +84,7 @@ class AutoCalibrator(object):
             'calibrated' : {} # Final calibrated values
         }
     
-    def initialize(self, gyro_rate, slices=None):
+    def initialize(self, gyro_rate, slices=None, skip_estimation=False):
         """Prepare calibrator for calibration
 
         This method does three things:
@@ -98,6 +98,8 @@ class AutoCalibrator(object):
             Estimated gyroscope sample rate
         slices : list of Slice, optional
             Slices to use for optimization
+        skip_estimation : bool
+            Do not estimate initial time offset and rotation.
 
         Raises
         --------------------
@@ -116,23 +118,14 @@ class AutoCalibrator(object):
             self.slices = videoslice.Slice.from_stream_randomly(self.video)
             logger.debug("Number of slices: {:d}".format(len(self.slices)))
 
-        time_offset = self.find_initial_offset()
-        # TODO: Detect when time offset initialization fails, and raise InitializationError
+        if not skip_estimation:
+            time_offset = self.find_initial_offset()
+            # TODO: Detect when time offset initialization fails, and raise InitializationError
 
-        logger.debug("Initial time offset: {:.4f}".format(time_offset))
-        self.params['initialized']['time_offset'] = time_offset
+            R = self.find_initial_rotation()
+            if R is None:
+                raise InitializationError("Failed to calculate initial rotation")
 
-        R = self.find_initial_rotation()
-        if R is None:
-            raise InitializationError("Failed to calculate initial rotation")
-
-        n, theta = rotations.rotation_matrix_to_axis_angle(R)
-        logger.debug("Found rotation: n={} theta={};  r={}".format(n, theta, n*theta))
-        logger.debug(R)
-        rx, ry, rz = theta * n
-        self.params['initialized']['rot_x'] = rx
-        self.params['initialized']['rot_y'] = ry
-        self.params['initialized']['rot_z'] = rz
         
     def video_time_to_gyro_sample(self, t):
         """Convert video time to gyroscope sample index and interpolation factor
@@ -229,6 +222,10 @@ class AutoCalibrator(object):
         frame_times = np.arange(len(flow)) / self.video.frame_rate
         gyro_times = np.arange(self.gyro.num_samples) / gyro_rate
         time_offset = timesync.sync_camera_gyro(flow, frame_times, self.gyro.data.T, gyro_times, levels=pyramids)
+        
+        logger.debug("Initial time offset: {:.4f}".format(time_offset))
+        self.params['initialized']['time_offset'] = time_offset
+        
         return time_offset
 
     def find_initial_rotation(self):
@@ -310,6 +307,14 @@ class AutoCalibrator(object):
         R, ransac_conseus_idx = ransac.RANSAC(model_func, eval_func, data,
                                               model_points, ransac_iterations,
                                               threshold, recalculate=True)
+
+        n, theta = rotations.rotation_matrix_to_axis_angle(R)
+        logger.debug("Found rotation: n={} theta={};  r={}".format(n, theta, n*theta))
+        logger.debug(R)
+        rx, ry, rz = theta * n
+        self.params['initialized']['rot_x'] = rx
+        self.params['initialized']['rot_y'] = ry
+        self.params['initialized']['rot_z'] = rz
 
         return R
 
