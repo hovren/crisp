@@ -53,15 +53,14 @@ classifiers = [
 
 keywords = 'gyroscope gyro camera imu calibration synchronization'
 
-requires = [ 'cv2', # OpenCV
-             'numpy',
+requires = [ 'numpy',
              'scipy',
              'matplotlib'
 ]
 
 
 setup(name='crisp',
-      version='2.1',
+      version='2.1.post3',
       author="Hannes Ovrén",
       author_email="hannes.ovren@liu.se",
       url="https://github.com/hovren/crisp",
@@ -72,7 +71,7 @@ setup(name='crisp',
       ext_modules=ext_modules,
 #      cmdclass={'build_ext' : build_ext},
       classifiers=classifiers,
-      install_requires=["numpy"],
+      install_requires=requires,
       requires=requires,
       keywords=keywords,
 #      cmdclass={'build_ext' : build_ext}
