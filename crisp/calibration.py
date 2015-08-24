@@ -225,12 +225,19 @@ class AutoCalibrator(object):
 
     def find_initial_rotation(self):
         """Estimate rotation between camera and gyroscope
+        
+        This sets and returns the initial rotation estimate.
+        Note that the initial time offset must have been estimated before calling this function!
+
 
         Returns
         --------------------
         (3,3) ndarray
             Estimated rotation between camera and gyroscope
         """
+        if 'time_offset' not in self.parameter:
+            raise InitializationError("Can not estimate rotation without an estimate of time offset. Please estimate the offset and try again.")
+            
         dt = 1.0 / self.parameter['gyro_rate']
         q = self.gyro.integrate(dt)
         
