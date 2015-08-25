@@ -304,7 +304,7 @@ class OpenCVCameraModel(CameraModel):
         """
         rvec = tvec = np.zeros(3)
         image_points, jac = cv2.projectPoints(points.T.reshape(-1,1,3), rvec, tvec, self.camera_matrix, self.dist_coefs)
-        return image_points
+        return image_points.reshape(-1,2).T
 
     def unproject(self, image_points):
         """Find (up to scale) 3D coordinate of an image point
