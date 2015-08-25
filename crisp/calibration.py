@@ -278,7 +278,11 @@ class AutoCalibrator(object):
                 v = -v
                 
             gyro_axes.append(v)
-            video_axes.append(_slice.axis)    
+            video_axes.append(_slice.axis)
+            
+        if len(gyro_axes) < 2:
+            logger.warning("Rotation estimation requires at least 2 rotation axes, got {}".format(len(gyro_axes)))
+            return None
 
         logger.debug("Using {:d} slices (from initial {:d} for rotation estimation".format(len(gyro_axes), len(self.slices)))
 
