@@ -242,6 +242,8 @@ class OpenCvVideoStream(VideoStream):
 
     def _frames(self):
         vc = cv2.VideoCapture(self.filename)
+        if not vc.isOpened():
+            raise IOError("Failed to open '{}'. Either there is something wrong with the file or OpenCV does not have the correct codec".format(self.filename))
         # OpenCV does something really stupid: to set the frame we need to set it twice and query in between
         t = self.start_time * 1000. # turn to milliseconds
         t2 = t + self.duration*1000.0 if self.duration is not None else None
