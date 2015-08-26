@@ -322,7 +322,7 @@ class OpenCVCameraModel(CameraModel):
         points : (3, N) ndarray
             3D coordinates (valid up to scale)
         """
-        undist_image_points = cv2.undistortPoints(image_points.T.reshape(-1,1,2), self.camera_matrix, self.dist_coefs, P=self.camera_matrix)
+        undist_image_points = cv2.undistortPoints(image_points.T.reshape(1,-1,2), self.camera_matrix, self.dist_coefs, P=self.camera_matrix)
         world_points = np.dot(self.inv_camera_matrix, to_homogeneous(undist_image_points.reshape(-1,2).T))
         return world_points
 
