@@ -3,4 +3,13 @@ build/
 *.mat
 *~
 *.m
+*.c
+*.so
+*.hdf
+*.ipynb
+.eggs/
+.idea/
+.ipynb_checkpoints/
+crisp.egg-info/
+dist/
 crisp/fastintegrate/fastint.c
