@@ -325,6 +325,18 @@ class OpenCVCameraModel(CameraModel):
         undist_image_points = cv2.undistortPoints(image_points.T.reshape(1,-1,2), self.camera_matrix, self.dist_coefs, P=self.camera_matrix)
         world_points = np.dot(self.inv_camera_matrix, to_homogeneous(undist_image_points.reshape(-1,2).T))
         return world_points
+    
+    @classmethod
+    def from_hdf(cls, filepath):
+        import h5py
+        with h5py.File(filepath, 'r') as f:
+            dist_coef = f["dist_coef"].value
+            K = f["K"].value
+            readout = f["readout"].value
+            image_size = f["size"].value
+            fps = f["fps"].value
+            instance = cls(image_size, fps, readout, K, dist_coef)
+            return instance
 
 
 def to_homogeneous(X):
