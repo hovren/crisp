@@ -326,7 +326,7 @@ class AutoCalibrator(object):
             print '  {:>11s} = {}'.format(param, self.parameter[param])
 
 def sample_at_time(t, rate):
-    s = t * rate
+    s = t * rate - 0.5 # Shift half sample due to rectangular integration
     n = int(np.ceil(s))
     tau = s - n
     return n, tau
