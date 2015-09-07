@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 """
 ZNCC using Pyramids
 """
@@ -89,9 +91,9 @@ def upsample(time_series, scaling_factor):
     Ns  = np.int(np.floor(np.size(time_series)*scaling_factor))
     ts_out = np.zeros((Ns,1), dtype='float64')
     for k in range(0,Ns):
-        cpos  = np.min([Ns0-1,np.max([0.,(k+0.5)/scaling_factor-0.5])])
+        cpos  = int(np.min([Ns0-1,np.max([0.,(k+0.5)/scaling_factor-0.5])]))
         cfrac = cpos-np.floor(cpos)
-        cind  = np.floor(cpos)
+        cind  = int(np.floor(cpos))
         #print "cpos=%f cfrac=%f cind=%d", (cpos,cfrac,cind)
         if cfrac>0:
             ts_out[k]=time_series[cind]*(1-cfrac)+time_series[cind+1]*cfrac
@@ -101,7 +103,7 @@ def upsample(time_series, scaling_factor):
     return ts_out
 
 def do_binning(time_series,factor):
-    Ns = np.size(time_series)/factor    
+    Ns = np.size(time_series) // factor    
     ts_out = np.zeros((Ns,1), dtype='float64')
     for k in range(0,Ns):
         ts_out[k]=0
@@ -144,7 +146,7 @@ def zncc(ts1,ts2):
     Ns2 = np.size(ts2)
     ts_out = np.zeros((Ns1,1), dtype='float64')
 
-    ishift = np.floor(Ns2/2) # origin of ts2
+    ishift = int(np.floor(Ns2/2)) # origin of ts2
 
     t1m = np.mean(ts1)
     t2m = np.mean(ts2)
@@ -204,7 +206,7 @@ def refine_correlation(ts1,ts2,shift_guess):
     Ns2 = np.size(ts2)
     ts_out = np.zeros((5,1))
 
-    ishift = np.floor(Ns2/2) # origin of ts2
+    ishift = int(np.floor(Ns2/2)) # origin of ts2
     k_offset = shift_guess-2+ishift # Try shifts starting with this one
 
     t1m = np.mean(ts1)

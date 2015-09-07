@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 """
 Video slice module
 """
@@ -127,9 +129,9 @@ def fill_sampling(slice_list, N):
     if N > N_max:
         raise ValueError("Tried to draw {:d} samples from a pool of only {:d} items".format(N, N_max))
     
-    samples_from = np.zeros((len(A),)) # Number of samples to draw from each group
+    samples_from = np.zeros((len(A),), dtype='int') # Number of samples to draw from each group
 
-    remaining = int(N - np.sum(samples_from))
+    remaining = N
     while remaining > 0:
         remaining_groups = np.flatnonzero(samples_from - np.array(A))
         

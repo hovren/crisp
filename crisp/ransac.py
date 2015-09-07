@@ -1,3 +1,5 @@
+from __future__ import division
+
 import numpy as np
 
 def RANSAC(model_func, eval_func, data, num_points, num_iter, threshold, recalculate=False):

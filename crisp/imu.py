@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 """
 IMU module
 """
@@ -130,7 +132,7 @@ class IMU(object):
         """
         
         if uniform:
-            dt = self.timestamps[1]-self.timestamps[0]
+            dt = float(self.timestamps[1]-self.timestamps[0]) # Must be python float for fastintegrate to work
             return fastintegrate.integrate_gyro_quaternion_uniform(self.gyro_data_corrected, dt)
         else:            
             N = len(self.timestamps)

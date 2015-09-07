@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 """
 Kinect NIR Structured Light Pattern removal
 """

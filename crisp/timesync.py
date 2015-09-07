@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 """
 Time synchronization module
 """
@@ -91,7 +93,7 @@ def sync_camera_gyro(image_sequence_or_flow, image_timestamps, gyro_data, gyro_t
     flow_timestamps = image_timestamps[:-2]
 
     # Resample to match highest
-    rate = lambda ts: len(ts) / float(ts[-1] - ts[0])
+    rate = lambda ts: len(ts) / (ts[-1] - ts[0])
     freq_gyro = rate(gyro_timestamps)
     freq_image = rate(flow_timestamps)
     
@@ -176,7 +178,7 @@ def sync_camera_gyro_manual(image_sequence, image_timestamps, gyro_data, gyro_ti
     gyro_normalized = (gyro_abs_max / np.max(gyro_abs_max)).flatten()
     flow_normalized = (flow / np.max(flow)).flatten()
 
-    rate = lambda ts: len(ts) / float(ts[-1] - ts[0])
+    rate = lambda ts: len(ts) / (ts[-1] - ts[0])
 
     # Resample to match highest
     freq_gyro = rate(gyro_timestamps)

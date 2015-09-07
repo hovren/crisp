@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+
 """
 Created on Wed Mar  5 10:24:38 2014
 
@@ -42,7 +44,7 @@ class L3GArduinoParser(GyroParserBase):
     
     def parse(self, input_data):
         total_bytes = len(input_data)
-        self.data = np.empty((3, total_bytes / 6)) # Will be lower than this
+        self.data = np.empty((3, total_bytes // 6)) # Will be lower than this
         temp_data = input_data
         num_bytes = 0
         while num_bytes < total_bytes - 1:
@@ -66,7 +68,7 @@ class L3GArduinoParser(GyroParserBase):
                 raise ParserException("No data scale loaded before first data packet")
             raw_str = data #b''.join([chr(x) for x in data])
             sfmt = "<hhh"
-            n = len(raw_str) / 6
+            n = len(raw_str) // 6
             for i in range(n):
                 data_str = raw_str[6*i:6*i+6]
                 x, y, z = struct.unpack(sfmt, data_str)
