@@ -244,11 +244,10 @@ class L3G4200DGyro(IMU):
         data, ts, T = l3g4200d.load_L3G_arduino(filename)
         
         # Our L3G4200D rig has some issues
-	if post_process:
-		print "Post processing L3G4200D data"
-		data = l3g4200d.post_process_L3G4200D_data(data)
-        assert data.shape[0] == 3, "Expected gyro to have 3 elements in first dim, got {0:d}".format(data.shape[0])        
-        
+        if post_process:
+            print "Post processing L3G4200D data"
+            data = l3g4200d.post_process_L3G4200D_data(data)
+            assert data.shape[0] == 3, "Expected gyro to have 3 elements in first dim, got {0:d}".format(data.shape[0])
         return ts, data
 
 
