@@ -1,0 +1,94 @@
+/usr/lib64/python2.7/site-packages/numpy/core/__init__.py:6: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib64/python2.7/site-packages/numpy/core/__init__.py:7: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib64/python2.7/site-packages/scipy/linalg/blas.py:145: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from scipy.linalg import _fblas
+/usr/lib64/python2.7/site-packages/scipy/linalg/lapack.py:215: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from scipy.linalg import _flapack
+/usr/lib64/python2.7/site-packages/PIL/Image.py:45: DeprecationWarning: classic int division
+  MAX_IMAGE_PIXELS = int(1024 * 1024 * 1024 / 4 / 3)
+/usr/lib64/python2.7/site-packages/scipy/interpolate/fitpack.py:38: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import dfitpack
+/usr/lib64/python2.7/site-packages/scipy/sparse/base.py:55: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib64/python2.7/site-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib64/python2.7/site-packages/matplotlib/cbook.py:350: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _BoundMethodProxy(object):
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:39: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from matplotlib._path import (affine_transform, count_bboxes_overlapping_bbox,
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:1089: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class Transform(TransformNode):
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:1488: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class TransformWrapper(Transform):
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:1586: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class AffineBase(Transform):
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:2005: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class BlendedGenericTransform(Transform):
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:2121: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class BlendedAffine2D(Affine2DBase):
+/usr/lib64/python2.7/site-packages/matplotlib/transforms.py:2205: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class CompositeGenericTransform(Transform):
+/usr/lib64/python2.7/site-packages/matplotlib/mathtext.py:63: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  import matplotlib._png as _png
+/usr/lib64/python2.7/site-packages/matplotlib/dviread.py:420: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class DviFont(object):
+/usr/lib64/python2.7/site-packages/matplotlib/figure.py:35: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from matplotlib import _image
+/usr/lib/python2.7/site-packages/dateutil/rrule.py:53: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class weekday(object):
+/usr/lib/python2.7/site-packages/dateutil/rrule.py:1079: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _genitem(object):
+/usr/lib/python2.7/site-packages/dateutil/relativedelta.py:10: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class weekday(object):
+/usr/lib/python2.7/site-packages/dateutil/relativedelta.py:41: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class relativedelta(object):
+/usr/lib/python2.7/site-packages/dateutil/tz.py:48: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class tzutc(datetime.tzinfo):
+/usr/lib/python2.7/site-packages/dateutil/tz.py:73: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class tzoffset(datetime.tzinfo):
+/usr/lib/python2.7/site-packages/dateutil/tz.py:104: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class tzlocal(datetime.tzinfo):
+/usr/lib/python2.7/site-packages/dateutil/tz.py:175: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _ttinfo(object):
+/usr/lib/python2.7/site-packages/dateutil/tz.py:215: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class tzfile(datetime.tzinfo):
+/usr/lib/python2.7/site-packages/dateutil/tz.py:507: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class tzrange(datetime.tzinfo):
+/usr/lib64/python2.7/site-packages/matplotlib/tri/triangulation.py:6: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  import matplotlib._tri as _tri
+/usr/lib64/python2.7/site-packages/matplotlib/backends/backend_agg.py:42: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from matplotlib.backends._backend_agg import RendererAgg as _RendererAgg
+/usr/lib64/python2.7/site-packages/scipy/stats/_distn_infrastructure.py:43: DeprecationWarning: The 'new' module has been removed in Python 3.0; use the 'types' module instead.
+  from new import instancemethod
+warning: GStreamer: unable to query duration of stream (/builddir/build/BUILD/opencv-2.4.11/modules/highgui/src/cap_gstreamer.cpp:787)
+warning: GStreamer: unable to seek (/builddir/build/BUILD/opencv-2.4.11/modules/highgui/src/cap_gstreamer.cpp:947)
+warning: GStreamer: unable to query duration of stream (/builddir/build/BUILD/opencv-2.4.11/modules/highgui/src/cap_gstreamer.cpp:787)
+warning: GStreamer: unable to seek (/builddir/build/BUILD/opencv-2.4.11/modules/highgui/src/cap_gstreamer.cpp:947)
+/home/hannes/Code/crisp/crisp/znccpyr.py:99: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  ts_out[k]=time_series[cind]
+/home/hannes/Code/crisp/crisp/znccpyr.py:97: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  ts_out[k]=time_series[cind]*(1-cfrac)+time_series[cind+1]*cfrac
+/home/hannes/Code/crisp/crisp/znccpyr.py:104: DeprecationWarning: classic int division
+  Ns = np.size(time_series)/factor
+/home/hannes/Code/crisp/crisp/znccpyr.py:147: DeprecationWarning: classic int division
+  ishift = np.floor(Ns2/2) # origin of ts2
+/home/hannes/Code/crisp/crisp/znccpyr.py:168: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  csum    += ts1[k+l-ishift]*ts2[l]
+/home/hannes/Code/crisp/crisp/znccpyr.py:169: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  ts1sum  += ts1[k+l-ishift]
+/home/hannes/Code/crisp/crisp/znccpyr.py:170: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  ts1sum2 += ts1[k+l-ishift]*ts1[k+l-ishift]
+/home/hannes/Code/crisp/crisp/znccpyr.py:207: DeprecationWarning: classic int division
+  ishift = np.floor(Ns2/2) # origin of ts2
+/home/hannes/Code/crisp/crisp/znccpyr.py:230: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  csum    += ts1[km+l-ishift]*ts2[l]
+/home/hannes/Code/crisp/crisp/znccpyr.py:231: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  ts1sum  += ts1[km+l-ishift]
+/home/hannes/Code/crisp/crisp/znccpyr.py:232: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  ts1sum2 += ts1[km+l-ishift]*ts1[km+l-ishift]
+/home/hannes/Code/crisp/crisp/videoslice.py:142: DeprecationWarning: classic int division
+  to_each = max(1, int(remaining / len(remaining_groups)))
+/home/hannes/Code/crisp/crisp/videoslice.py:160: DeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  samples.append(q[:n])
