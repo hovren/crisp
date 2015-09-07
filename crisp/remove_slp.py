@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 """
 Kinect NIR Structured Light Pattern removal

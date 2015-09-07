@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function
+
 #from distutils.core import setup
 #from distutils.extension import Extension
 #from setuptools.command.sdist import sdist as _sdist
@@ -10,7 +12,7 @@ import sys
 try:
     import numpy as np
 except ImportError:
-    print "Please install numpy before building this package"
+    print("Please install numpy before building this package")
     raise
 
 try:
@@ -24,7 +26,7 @@ try:
     from pypandoc import convert
     read_md = lambda f: convert(f, 'rst')
 except ImportError:
-    print "warning: pypandoc module not found, could not convert Markdown to RST"
+    print("warning: pypandoc module not found, could not convert Markdown to RST")
     read_md = lambda f: open(f, 'r').read()
 
 # Fast quaternion integration module

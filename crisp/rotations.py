@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 """
 Rotation handling module
@@ -199,7 +199,7 @@ def integrate_gyro_quaternion(gyro_ts, gyro_data):
     q_list[0,:] = np.array([1, 0, 0, 0]) # Initial rotation (no rotation)
     
     # Iterate over all (except first)
-    for i in xrange(1, gyro_ts.size):
+    for i in range(1, gyro_ts.size):
         w = gyro_data[i]
         dt = gyro_ts[i] - gyro_ts[i - 1]
         qprev = q_list[i - 1]

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 """
 Camera-gyro calibration module
@@ -322,10 +322,10 @@ class AutoCalibrator(object):
 
     def print_params(self):
         """Print the current best set of parameters"""
-        print "Parameters"
-        print "--------------------"
+        print("Parameters")
+        print("--------------------")
         for param in PARAM_ORDER:
-            print '  {:>11s} = {}'.format(param, self.parameter[param])
+            print('  {:>11s} = {}'.format(param, self.parameter[param]))
 
 def sample_at_time(t, rate):
     s = t * rate - 0.5 # Shift half sample due to rectangular integration
