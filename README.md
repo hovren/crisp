@@ -12,6 +12,18 @@ If you use the package for your work, please cite the following paper
 
 > Ovrén, H and Forssén, P.-E. "Gyroscope-based video stabilisation with auto-calibration." In 2015 IEEE International Conference on Robotics and Automation (ICRA) (pp. 2090–2097). Seattle, WA
 
+## Can I use these methods for my application?
+The calibration methods in this package assumes the following
+
+- Your camera is calibrated, including known readout time
+- The camera frame rate is constant, and known
+- The gyroscope frame rate is constant, and approximately known (within a few Hz, or percent)
+
+If the video and gyroscope data are *not uniformly sampled*, but you have access
+to somewhat reliable timestamps, then you can still use the method
+if you resample the data to be uniform.
+By "reliable" we mean timestamps without drift, and no (or negligble) jitter.
+
 ## Changes from 1.0
 The 2.0 version of crisp features a new fully automatic calibrator.
 This means that there is no compelling reason to use the semi-manual methods in the previous version of crisp.
@@ -26,8 +38,11 @@ To use the package you need the following Python packages:
 * OpenCV
 * matplotlib
 
-To build, you also need the Cython package.
+The easiest way is to install from PyPI:
 
+    $ pip install crisp
+
+If you want to build the package from source, you also need the *Cython* package.
 To build and install the `crisp` module just run the following commands:
 
     $ python setup.py build
