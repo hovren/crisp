@@ -50,7 +50,8 @@ classifiers = [
 
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
-    'Programming Language :: Python :: 2.7'
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3.4'
 ]
 
 keywords = 'gyroscope gyro camera imu calibration synchronization'
@@ -62,7 +63,7 @@ requires = [ 'numpy',
 
 
 setup(name='crisp',
-      version='2.1.post3',
+      version='2.2',
       author="Hannes Ovrén",
       author_email="hannes.ovren@liu.se",
       url="https://github.com/hovren/crisp",
