@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, absolute_import
+
 """
 Created on Wed Mar  5 10:24:38 2014
 
@@ -42,7 +44,7 @@ class L3GArduinoParser(GyroParserBase):
     
     def parse(self, input_data):
         total_bytes = len(input_data)
-        self.data = np.empty((3, total_bytes / 6)) # Will be lower than this
+        self.data = np.empty((3, total_bytes // 6)) # Will be lower than this
         temp_data = input_data
         num_bytes = 0
         while num_bytes < total_bytes - 1:
@@ -56,7 +58,7 @@ class L3GArduinoParser(GyroParserBase):
         try:
             self.data *= self.data_scale
         except RuntimeWarning:
-            print "Scale warning! res=", self.data, "*", self.data_scale
+            print("Scale warning! res=", self.data, "*", self.data_scale)
         self.data = self.data[:,0:self.ndata]
              
                     
@@ -66,7 +68,7 @@ class L3GArduinoParser(GyroParserBase):
                 raise ParserException("No data scale loaded before first data packet")
             raw_str = data #b''.join([chr(x) for x in data])
             sfmt = "<hhh"
-            n = len(raw_str) / 6
+            n = len(raw_str) // 6
             for i in range(n):
                 data_str = raw_str[6*i:6*i+6]
                 x, y, z = struct.unpack(sfmt, data_str)
@@ -92,7 +94,7 @@ class L3GArduinoParser(GyroParserBase):
             #print "Sample rate byte (%d) %s" % (len(data), data.__repr__())
             #T = struct.unpack(sfmt, data)
             #print "Got sample rate", T
-            print "Got sample rate byte, but until implementation is changed in Arduino code, the value should not be used as it is unstable as hell."
+            print("Got sample rate byte, but until implementation is changed in Arduino code, the value should not be used as it is unstable as hell.")
             # Note: Reimplement the Arduino code to emit timestamps on a regular basis that can be used to fix the time rate.
             self.actual_data_rate = None#1000000. / T[0] # Hz
         elif command == L3GArduinoParser.COMMAND_TIME_SYNC:
@@ -108,17 +110,17 @@ def load_L3G_arduino(filename, remove_begin_spurious=False, return_parser=False)
     data = parser.data
     if parser.actual_data_rate:
         T = 1. / parser.actual_data_rate
-        print "Found measured data rate %.3f ms (%.3f Hz)" % (1000*T, 1. / T)
+        print("Found measured data rate %.3f ms (%.3f Hz)" % (1000*T, 1. / T))
     else:
         T = 1. / parser.data_rate
-        print "Using data rate provided by gyro (probably off by a few percent!) %.3f ms (%.3f Hz)" % (1000*T, 1. / T)
+        print("Using data rate provided by gyro (probably off by a few percent!) %.3f ms (%.3f Hz)" % (1000*T, 1. / T))
         
     N = parser.data.shape[1]
     t = np.linspace(0, T*N, num=data.shape[1])
-    print t.shape, data.shape
-    print "Loaded %d samples (%.2f seconds) with expected sample rate %.3f ms (%.3f Hz)" % (N, t[-1], T*1000.0, 1./T)
+    print(t.shape, data.shape)
+    print("Loaded %d samples (%.2f seconds) with expected sample rate %.3f ms (%.3f Hz)" % (N, t[-1], T*1000.0, 1./T))
     try:
-        print "Actual sample rate is %.3f ms (%.3f Hz)" % (1000. / parser.actual_data_rate, parser.actual_data_rate, )
+        print("Actual sample rate is %.3f ms (%.3f Hz)" % (1000. / parser.actual_data_rate, parser.actual_data_rate, ))
     except TypeError:
         pass
     

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, absolute_import
+
 """
 Camera-gyro calibration module
 """
@@ -243,7 +245,7 @@ class AutoCalibrator(object):
         if 'time_offset' not in self.parameter:
             raise InitializationError("Can not estimate rotation without an estimate of time offset. Please estimate the offset and try again.")
             
-        dt = 1.0 / self.parameter['gyro_rate']
+        dt = float(1.0 / self.parameter['gyro_rate']) # Must be python float for fastintegrate
         q = self.gyro.integrate(dt)
         
         video_axes = []
@@ -256,9 +258,9 @@ class AutoCalibrator(object):
                 continue
             assert _slice.angle > 0
             
-            t1 = _slice.start / float(self.video.frame_rate)
+            t1 = _slice.start / self.video.frame_rate
             n1, _ = self.video_time_to_gyro_sample(t1)
-            t2 = _slice.end / float(self.video.frame_rate)
+            t2 = _slice.end / self.video.frame_rate
             n2, _ = self.video_time_to_gyro_sample(t2)
             
             try:
@@ -320,10 +322,10 @@ class AutoCalibrator(object):
 
     def print_params(self):
         """Print the current best set of parameters"""
-        print "Parameters"
-        print "--------------------"
+        print("Parameters")
+        print("--------------------")
         for param in PARAM_ORDER:
-            print '  {:>11s} = {}'.format(param, self.parameter[param])
+            print('  {:>11s} = {}'.format(param, self.parameter[param]))
 
 def sample_at_time(t, rate):
     s = t * rate - 0.5 # Shift half sample due to rectangular integration
@@ -347,7 +349,7 @@ def optimization_func(x, slices, slice_sample_idxs, camera, gyro):
     v /= theta
     R_g2c = rotations.axis_angle_to_rotation_matrix(v, theta)
 
-    Tg = float(1. / Fg)
+    Tg = float(1. / Fg) # Must be python float for fastintegrate to work
     row_delta = camera.readout / camera.rows
 
     errors = [] # Residual vector

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 """
 This is an example script that shows how to run the calibrator on our dataset.
 The dataset can be found here:

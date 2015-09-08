@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, absolute_import
+
 """
 IMU module
 """
@@ -130,7 +132,7 @@ class IMU(object):
         """
         
         if uniform:
-            dt = self.timestamps[1]-self.timestamps[0]
+            dt = float(self.timestamps[1]-self.timestamps[0]) # Must be python float for fastintegrate to work
             return fastintegrate.integrate_gyro_quaternion_uniform(self.gyro_data_corrected, dt)
         else:            
             N = len(self.timestamps)
@@ -138,7 +140,7 @@ class IMU(object):
             integrated[:,0] = np.array([1, 0, 0, 0]) # Initial rotation (no rotation)
             
             # Iterate over all
-            for i in xrange(1, len(self.timestamps)):
+            for i in range(1, len(self.timestamps)):
                 w = pose_correction.dot(self.gyro_data[:, i]) # Change to correct coordinate frame
                 dt = float(self.timestamps[i] - self.timestamps[i - 1])
                 qprev = integrated[:, i - 1].flatten()
@@ -242,11 +244,10 @@ class L3G4200DGyro(IMU):
         data, ts, T = l3g4200d.load_L3G_arduino(filename)
         
         # Our L3G4200D rig has some issues
-	if post_process:
-		print "Post processing L3G4200D data"
-		data = l3g4200d.post_process_L3G4200D_data(data)
-        assert data.shape[0] == 3, "Expected gyro to have 3 elements in first dim, got {0:d}".format(data.shape[0])        
-        
+        if post_process:
+            print("Post processing L3G4200D data")
+            data = l3g4200d.post_process_L3G4200D_data(data)
+            assert data.shape[0] == 3, "Expected gyro to have 3 elements in first dim, got {0:d}".format(data.shape[0])
         return ts, data
 
 

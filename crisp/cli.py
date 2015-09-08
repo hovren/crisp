@@ -2,6 +2,7 @@
 """
 Command line interface helpers
 """
+from __future__ import absolute_import
 
 __author__ = "Hannes Ovrén"
 __copyright__ = "Copyright 2013, Hannes Ovrén"
@@ -39,7 +40,7 @@ def load_imu_from_file(imu_file):
 def load_vars_from_mat(filename, var_dict):
     result_dict = {}
     M = loadmat(filename)
-    for var_name, possible_names in var_dict.items():
+    for var_name, possible_names in list(var_dict.items()):
         val = None
         for key in possible_names:
             logger.debug("Trying %s for variable %s in %s" % (key, var_name, filename))

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, absolute_import
+
 """
 Input streams module
 """
@@ -16,6 +18,12 @@ import cv2
 import numpy as np
 
 from . import fastintegrate, tracking
+
+# Handle OpenCV 2.4.x -> 3.0
+try:
+    CV_CAP_PROP_POS_MSEC = cv2.cv.CV_CAP_PROP_POS_MSEC
+except AttributeError:
+    CV_CAP_PROP_POS_MSEC = cv2.CAP_PROP_POS_MSEC
 
 class GyroStream(object):
     def __init__(self):
@@ -249,9 +257,9 @@ class OpenCvVideoStream(VideoStream):
         t2 = t + self.duration*1000.0 if self.duration is not None else None
 
         for i in range(2): # Sometimes needed for setting to stick
-            vc.set(cv2.cv.CV_CAP_PROP_POS_MSEC, t)
+            vc.set(CV_CAP_PROP_POS_MSEC, t)
             vc.read()
-        t = vc.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
+        t = vc.get(CV_CAP_PROP_POS_MSEC)
         counter = 0
         retval = True
         while retval and (t2 is None or (t2 is not None and t < t2)):
@@ -263,5 +271,5 @@ class OpenCvVideoStream(VideoStream):
                 raise IOError("Failed to get frame at time %.2f" % t)
             else:
                 pass # Loop will end normally
-            t = vc.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
+            t = vc.get(CV_CAP_PROP_POS_MSEC)
             counter += 1

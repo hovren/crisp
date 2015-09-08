@@ -1,3 +1,5 @@
+from __future__ import division, print_function, absolute_import
+
 import numpy as np
 
 def RANSAC(model_func, eval_func, data, num_points, num_iter, threshold, recalculate=False):
@@ -13,9 +15,9 @@ def RANSAC(model_func, eval_func, data, num_points, num_iter, threshold, recalcu
     """
     M = None
     max_consensus = 0
-    all_idx = range(data.shape[1])
+    all_idx = list(range(data.shape[1]))
     final_consensus = []
-    for k in xrange(num_iter):
+    for k in range(num_iter):
         np.random.shuffle(all_idx)
         model_set = all_idx[:num_points]
         x = data[:, model_set]

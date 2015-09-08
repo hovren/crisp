@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, absolute_import
+
 """
 Camera module
 """
@@ -16,7 +18,7 @@ import numpy as np
 import cv2
 import scipy.interpolate
 
-import remove_slp
+from . import remove_slp
 
 class CameraModel(object):
     """Class that describes a camera model
@@ -485,7 +487,7 @@ class Kinect(object):
         EXPECTED_DELTA = 2002155 # Expected time between IR frames
         MAX_DIFF = EXPECTED_DELTA / 4
         bad_list = []
-        for frame_num in xrange(1, len(ts_list)):
+        for frame_num in range(1, len(ts_list)):
             diff = ts_list[frame_num] - ts_list[frame_num-1]
             if abs(diff - EXPECTED_DELTA) > MAX_DIFF:
                 bad_list.append(frame_num)
