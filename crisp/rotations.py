@@ -239,20 +239,26 @@ def slerp(q1, q2, u):
     q2 = q2.flatten()
     assert q1.shape == q2.shape
     assert q1.size == 4
-    costheta = np.sqrt(np.sum(q1 * q2))    
+    costheta = np.dot(q1, q2)
+
+    if np.isclose(u, 0.):
+        return q1
+    elif np.isclose(u, 1.):
+        return q2
+    elif u > 1 or u < 0:
+        raise ValueError("u must be in range [0, 1]")
+
+    # Shortest path
+    if costheta < 0:
+        costheta = -costheta
+        q2 = -q2
+
     theta = np.arccos(costheta)
-    
+
     f1 = np.sin((1.0 - u)*theta) / np.sin(theta)
     f2 = np.sin(u*theta) / np.sin(theta)
-    
-    # Shortest path is wanted, so conjugate if necessary
-    if costheta < 0:
-        f1 = -f1
-        q = f1*q1 + f2*q2
-        q = q / np.sqrt(np.sum(q**2)) # Normalize
-    else:
-        q = f1*q1 + f2*q2 
-        q = q / np.sqrt(np.sum(q**2)) # Normalize
+    q = f1*q1 + f2*q2
+    q = q / np.sqrt(np.sum(q**2)) # Normalize
     return q
 
 #--------------------------------------------------------------------------
