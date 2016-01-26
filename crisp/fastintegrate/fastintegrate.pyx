@@ -16,7 +16,8 @@ DTYPE = np.float
 ctypedef np.double_t DTYPE_t
 
 @cython.boundscheck(False)
-def integrate_gyro_quaternion_uniform(np.ndarray[DTYPE_t,ndim=2] gyro_data, np.float dt):
+def integrate_gyro_quaternion_uniform(np.ndarray[DTYPE_t,ndim=2] gyro_data, np.float dt,
+                                      initial=None):
     #NB: Quaternion q = [a, n1, n2, n3], scalar first
     cdef unsigned int N = gyro_data.shape[0]
     cdef np.ndarray[DTYPE_t, ndim=2] q_list = np.empty((N, 4)) # Nx4 quaternion list
@@ -31,8 +32,11 @@ def integrate_gyro_quaternion_uniform(np.ndarray[DTYPE_t,ndim=2] gyro_data, np.f
     cdef DTYPE_t dt_half = dt / 2.0
     
     # Initial rotation
-    q0 = 1.0
-    q1 = q2 = q3 = 0.0    
+    if initial is None:
+        q0 = 1.0
+        q1 = q2 = q3 = 0.0
+    else:
+        q0, q1, q2, q3 = initial
     
     for i in range(N):
         wx = gyro_data[i,0]
