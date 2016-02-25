@@ -143,6 +143,9 @@ def track(image_list, initial_points, remove_bad=True):
         prev_ok_track = np.flatnonzero(track_status)
         prev_points = tracks[prev_ok_track,i-1,:]
         [points, status, err] = cv2.calcOpticalFlowPyrLK(img1, img2, prev_points, empty, empty, empty, window_size)
+        if status is None:
+            track_status[:] = 0 # All tracks are bad
+            break
         valid_set = np.flatnonzero(status)
         now_ok_tracks = prev_ok_track[valid_set] # Remap
         tracks[now_ok_tracks,i,:] = points[valid_set]
