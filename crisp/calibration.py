@@ -120,6 +120,10 @@ class AutoCalibrator(object):
             self.slices = videoslice.Slice.from_stream_randomly(self.video)
             logger.debug("Number of slices: {:d}".format(len(self.slices)))
 
+        if len(self.slices) < 2:
+            logger.error("Calibration requires at least 2 video slices to proceed, got %d", len(self.slices))
+            raise InitializationError("Calibration requires at least 2 video slices to proceed, got {:d}".format(len(self.slices)))
+
         if not skip_estimation:
             time_offset = self.find_initial_offset()
             # TODO: Detect when time offset initialization fails, and raise InitializationError
