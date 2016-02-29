@@ -253,6 +253,10 @@ def slerp(q1, q2, u):
         costheta = -costheta
         q2 = -q2
 
+    # Almost the same, we can return any of them?
+    if np.isclose(costheta, 1.0):
+        return q1
+
     theta = np.arccos(costheta)
 
     f1 = np.sin((1.0 - u)*theta) / np.sin(theta)
