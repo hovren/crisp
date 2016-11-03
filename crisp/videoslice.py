@@ -151,13 +151,12 @@ def fill_sampling(slice_list, N):
 
     # Construct index list of selected samples
     samples = []
-    for a, n in zip(A, samples_from):
+    for s, a, n in zip(slice_list, A, samples_from):
         if a == n:
-            samples.append(np.arange(a)) # all
+            samples.append(np.array(s.inliers)) # all
         elif a == 0:
             samples.append(np.arange([]))
         else:
-            q = np.arange(a)
-            np.random.shuffle(q)
-            samples.append(q[:n])
+            chosen = np.random.choice(s.inliers, n, replace=False)
+            samples.append(np.array(chosen))
     return samples
