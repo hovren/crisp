@@ -24,6 +24,7 @@ PARAM_ORDER = ('gyro_rate', 'time_offset', 'gbias_x', 'gbias_y', 'gbias_z', 'rot
 
 MAX_OPTIMIZATION_TRACKS = 1500
 MAX_OPTIMIZATION_FEV = 800
+DEFAULT_NORM_C = 3.0
 
 class CalibrationError(Exception):
     pass
@@ -163,7 +164,7 @@ class AutoCalibrator(object):
             D.update(self.params[source])
         return D              
         
-    def calibrate(self, max_tracks=MAX_OPTIMIZATION_TRACKS, max_eval=MAX_OPTIMIZATION_FEV):
+    def calibrate(self, max_tracks=MAX_OPTIMIZATION_TRACKS, max_eval=MAX_OPTIMIZATION_FEV, norm_c=DEFAULT_NORM_C):
         """Perform calibration
 
         Parameters
@@ -190,7 +191,7 @@ class AutoCalibrator(object):
         # Get subset of available tracks such that all slices are still used
         slice_sample_idxs = videoslice.fill_sampling(self.slices, max_tracks)
 
-        func_args = (self.slices, slice_sample_idxs, self.video.camera_model, self.gyro)
+        func_args = (self.slices, slice_sample_idxs, self.video.camera_model, self.gyro, norm_c)
         self.slice_sample_idxs = slice_sample_idxs
         logger.debug("Starting optimization on {:d} slices and {:d} tracks".format(len(self.slices), max_tracks))
         start_time = time.time()
@@ -341,7 +342,7 @@ def robust_norm(r, c):
     return r / (1 + (np.abs(r)/c))
 
 
-def optimization_func(x, slices, slice_sample_idxs, camera, gyro):
+def optimization_func(x, slices, slice_sample_idxs, camera, gyro, norm_c):
     # Unpack parameters and convert representations
     Fg, offset, gbias_x, gbias_y, gbias_z, rot_x, rot_y, rot_z, = x
 
@@ -462,7 +463,6 @@ def optimization_func(x, slices, slice_sample_idxs, camera, gyro):
         raise ValueError("No residuals!")
 
     # Apply robust norm
-    c = 3.0
-    robust_errors = robust_norm(np.array(errors), c)
+    robust_errors = robust_norm(np.array(errors), norm_c)
 
     return robust_errors
