@@ -101,6 +101,7 @@ def sync_camera_gyro(image_sequence_or_flow, image_timestamps, gyro_data, gyro_t
         rel_rate = freq_gyro / freq_image
         flow_mag = znccpyr.upsample(flow_org, rel_rate)
     else:
+        flow_mag = flow_org
         rel_rate = freq_image / freq_gyro
         gyro_mag = znccpyr.upsample(gyro_mag, rel_rate)
     
