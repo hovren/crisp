@@ -11,13 +11,14 @@ __license__ = "GPL"
 __email__ = "hannes.ovren@liu.se"
 
 import os
+import collections
 import logging
 logger = logging.getLogger('crisp')
 
 import cv2
 import numpy as np
 
-from . import fastintegrate, tracking
+from . import fastintegrate, tracking, rotations
 
 # Handle OpenCV 2.4.x -> 3.0
 try:
@@ -113,7 +114,7 @@ class VideoStream(object):
             do_stuff(frame)
 
     """
-    def __init__(self, camera_model):
+    def __init__(self, camera_model, flow_mode='optical'):
         """Create a VideoStream object
 
         Parameters
@@ -122,6 +123,7 @@ class VideoStream(object):
                      Camera model used by this stream
         """
         self._flow = None
+        self.flow_mode = flow_mode
         self.camera_model = camera_model
 
     def __iter__(self):
@@ -195,25 +197,61 @@ class VideoStream(object):
     @property
     def flow(self):
         if self._flow is None:
-            logger.debug("Generating optical flow magnitude. This can take minutes depending on video length")
-            self._flow = tracking.optical_flow_magnitude(self)
+            logger.debug("Generating flow. This can take minutes depending on video length")
+            if self.flow_mode == 'rotation':
+                self._generate_frame_to_frame_rotation()
+            elif self.flow_mode == 'optical':
+                self._flow = tracking.optical_flow_magnitude(self)
+            else:
+                raise ValueError("No such flow mode '{}'".format(self.flow_mode))
             #self.__generate_flow()
         return self._flow
-    
-    def __generate_flow(self):
-        logger.debug("Generating flow")
-        flow_list = []
-        prev_im = None
-        prev_pts = None
-        for i, im in enumerate(self):
-            im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-            if prev_im is None:
-                prev_im = im
-            else:
-                pts, initial_pts = tracking.track_points(prev_im, im)
-                dist = np.sqrt(np.sum((pts - initial_pts)**2, axis=1))
-                flow_list.append(np.mean(dist))
-        self._flow = np.array(flow_list)
+
+    def _generate_frame_to_frame_rotation(self):
+        rotation = []
+        weights = []
+        step = 1
+        maxlen = step + 1
+        frame_queue = collections.deque([], maxlen)
+        for frame in self:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frame_queue.append(frame)
+            if len(frame_queue) == maxlen:
+                max_corners = 500
+                quality_level = 0.07  # Why??
+                min_distance = 10
+                initial_pts = cv2.goodFeaturesToTrack(frame_queue[0], max_corners, quality_level, min_distance)
+                pts, status = tracking.track_retrack(list(frame_queue), initial_pts)
+                X = pts[:, 0, :].T
+                Y = pts[:, 1, :].T
+                threshold = 2.0
+                R, _, err, inliers = rotations.estimate_rotation_procrustes_ransac(X, Y, self.camera_model, threshold)
+                if R is None:
+                    weight = 0
+                    angle = 0
+                    r = np.zeros(3)
+                else:
+                    weight = (1.0 * len(inliers)) / len(pts)
+                    axis, angle = rotations.rotation_matrix_to_axis_angle(R)
+                    r = axis * angle
+                rotation.append(r.reshape(3, 1))
+                weights.append(weight)
+
+        rotation = np.hstack(rotation)
+        weights = np.array(weights)
+
+        # Scale from rad/frame to rad/s
+        rotation *= self.camera_model.frame_rate
+
+        # Remove and interpolate bad values
+        threshold = 0.2
+        mask = weights > threshold
+        x = np.arange(rotation.shape[1])
+        for i in range(3):
+            rotation[i, ~mask] = np.interp(x[~mask], x[mask], rotation[i, mask])
+
+        self._frame_rotations = rotation
+        self._flow = np.linalg.norm(rotation, axis=0)
 
 class OpenCvVideoStream(VideoStream):
     """Video stream that uses OpenCV to extract image data.
