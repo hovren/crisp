@@ -8,6 +8,7 @@ from __future__ import absolute_import, print_function
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as _build_ext
 import sys
+import codecs
 
 try:
     import numpy as np
@@ -27,7 +28,7 @@ try:
     read_md = lambda f: convert(f, 'rst')
 except ImportError:
     print("warning: pypandoc module not found, could not convert Markdown to RST")
-    read_md = lambda f: open(f, 'r').read()
+    read_md = lambda f: codecs.open(f, encoding='utf-8').read()
 
 # Fast quaternion integration module
 file_ext = 'pyx' if USE_CYTHON else 'c'
