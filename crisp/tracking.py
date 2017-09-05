@@ -205,7 +205,7 @@ def track_retrack(image_list, initial_points, max_retrack_distance=0.5, keep_bad
 
     # Allowed
     retracked_ok = np.flatnonzero(retrack_distance <= max_retrack_distance)
-    final_ok = np.intersect1d(ok_track, retracked_ok)
+    final_ok = ok_track[retracked_ok]
 
     if keep_bad: # Let caller check status
         status = np.zeros(forward_status.shape)
